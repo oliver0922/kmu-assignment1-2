@@ -9,11 +9,15 @@ Searching for Opensource about recognition
 
 Classification은 자율주행 인지뿐만 아니라 다른 분야에서도 사용되는 computer vision의 기초적인 분야이다. 단순히 Classification은 어떠한 정보가 주어질 때 그 입력된 데이터를 보고 어떠한 물체인지 분류를 하는 것을 말한다. 보통 자율주행의 인지 분야에서 사용되는 Classification은 image classification 중에서 multi-label classification이고 이를 위해서 우리는 Convolutional Neural Network를 사용한다. 
 
-![image](https://user-images.githubusercontent.com/69920975/113874206-84269b80-97f0-11eb-8778-4a306bb7c2dc.png) <그림 9>
+![image](https://user-images.githubusercontent.com/69920975/113874206-84269b80-97f0-11eb-8778-4a306bb7c2dc.png) 
+
+<그림 9>
 
 <그림 9>이 인공신경망에 주어졌을 때 이를 아래와 같은 여러 개의 층에 통과를 시켜 마지막에 이 주어진 정보가 어떤 물체인지 분류한다. 예를 들어서 위와 같은 사진이 CNN Network에 주어졌을 때 고양이인 확률이 82%로 가장 값이 크므로 이 신경망은 주어진 사진이 고양이라는 결과를 도출한다. 
 
-![image](https://user-images.githubusercontent.com/69920975/113874302-9ef91000-97f0-11eb-9c95-1688460f7901.png)<그림 10 CNN의 구조>
+![image](https://user-images.githubusercontent.com/69920975/113874302-9ef91000-97f0-11eb-9c95-1688460f7901.png)
+
+<그림 10 CNN의 구조>
 
 인공신경망의 구조는 크게 3가지의 층으로 이루어진다.
 
@@ -21,24 +25,37 @@ Classification은 자율주행 인지뿐만 아니라 다른 분야에서도 사
 
 Convolution 층에서는 입력 데이터를 필터가 stride만큼 움직이면서 Convolution 연산을 수행한다. 이렇게 수행을 하는 경우 신경망의 연결 관점에서 보았을 때는 Deep Neural Network에 비해 연결이 희소하고 즉 다시 말해 parameter 개수가 적다고 생각할 수 있지만 convolution 연산을 반복하면 추출된 정보가 누적되므로 사실상 parameter 개수는 줄이되 입력된 정보의 특징은 똑같이 추출하는 효과를 낼 수 있다.
 
-![image](https://user-images.githubusercontent.com/69920975/113874348-addfc280-97f0-11eb-982e-a6fd014240c6.png) <그림 11>
+![image](https://user-images.githubusercontent.com/69920975/113874348-addfc280-97f0-11eb-982e-a6fd014240c6.png)
+
+<그림 11>
 
 하지만 위의 <그림11>을 보듯이 Convolution 연산을 수행하면 입력 데이터의 크기가 작아진다는 단점이 있다. 즉 input data의 손실이 있을 수도 있는데 이를 방지하고자 padding 이라는 기술을 사용하는데 이는 input data 주변을 0으로 둘러싸서 convolution 연산을 수행하고도 output data의 크기가 input data의 크기와 같게 만들어 준다. 
 
-![image](https://user-images.githubusercontent.com/69920975/113874364-b33d0d00-97f0-11eb-9ae5-512c902284e7.png) <그림 12 zeropadding 예>
+![image](https://user-images.githubusercontent.com/69920975/113874364-b33d0d00-97f0-11eb-9ae5-512c902284e7.png) 
+
+<그림 12 zeropadding 예>
 
 마지막으로 convolution 층에서는 stride 값이 중요하다. stride는 input data에 겹쳐지는 filter가 움직이는 보폭을 결정하는데 이 값에 따라서 아무리 padding을 적용시켰다해도 input data에 비해 output data의 크기가 작아질 수 있다. 이제 stride 값과 padding 값을 알았으니 input data에 따른 output data의 크기를 계산할 수 있다. 아래 오른쪽 식은 각각 값들이 주어질 때 계산하는 식이다.
 
-![image](https://user-images.githubusercontent.com/69920975/113874403-bafcb180-97f0-11eb-8ae9-a76d645b9830.png)<그림 13 stride가 2일 때> 
-![image](https://user-images.githubusercontent.com/69920975/113874417-bcc67500-97f0-11eb-9e7a-046d335369f0.png)<그림 14 output channel을 계산하는 수식>
+![image](https://user-images.githubusercontent.com/69920975/113874403-bafcb180-97f0-11eb-8ae9-a76d645b9830.png)
+
+<그림 13 stride가 2일 때> 
+
+![image](https://user-images.githubusercontent.com/69920975/113874417-bcc67500-97f0-11eb-9e7a-046d335369f0.png)
+
+<그림 14 output channel을 계산하는 수식>
 
 **② Polling 층**
 
  Pooling층은 두 가지 종류가 있다. Max pooling과 Average Pooling이 있는데 Max Polling은 input data에서 filter 크기만큼의 영역에서 가장 큰 값을 추출하는 것이고 Average Pooling은 마찬가지로 filter 크기만큼의 영역에서의 input data 값들의 평균을 추출하는 연산이다. Pooling 연산은 보통 input data가 조금 변형되도 값이 똑같으므로 input data에 강건하다는 특징이 있으며, 계산 횟수를 줄여준다.
  
- ![image](https://user-images.githubusercontent.com/69920975/113874484-ccde5480-97f0-11eb-8398-3f7f2e3e92ad.png)<그림 15. Max Pooling의 예시(데이터가 조금 변형되도 값은 동일하다)>
+ ![image](https://user-images.githubusercontent.com/69920975/113874484-ccde5480-97f0-11eb-8398-3f7f2e3e92ad.png)
  
- ![image](https://user-images.githubusercontent.com/69920975/113874500-d49df900-97f0-11eb-86a8-6b304499e7ee.png) <그림 16.Max pooling과 Average pooling>
+ <그림 15. Max Pooling의 예시(데이터가 조금 변형되도 값은 동일하다)>
+ 
+ ![image](https://user-images.githubusercontent.com/69920975/113874500-d49df900-97f0-11eb-86a8-6b304499e7ee.png) 
+ 
+ <그림 16.Max pooling과 Average pooling>
  
  **③ Fully Connected Layer**
  
@@ -48,13 +65,17 @@ Convolution 층에서는 입력 데이터를 필터가 stride만큼 움직이면
  
  **④ Optimizer**
  
- ![image](https://user-images.githubusercontent.com/69920975/113874577-eaabb980-97f0-11eb-8468-571449334a32.png)<그림 18. Adam optimization algorithm>
+ ![image](https://user-images.githubusercontent.com/69920975/113874577-eaabb980-97f0-11eb-8468-571449334a32.png)
+ 
+ <그림 18. Adam optimization algorithm>
  
  이제 오픈소스에서 사용된 Optimizer에 대해 알아보자. Optimizer에는 여러 종류(SGD, NAG,NAdam)가 있는데 이번 오픈소스에서는 Adam Optimizer가 사용됐다 Adam Optimizer에는 RMS Prop 방법과 momentum hyperparameter가 같이 쓰였다. 
  
  1) RMS prop 
 
-![image](https://user-images.githubusercontent.com/69920975/113874616-f39c8b00-97f0-11eb-9605-8cd9d9a298da.png)<그림 19. RMS prop>
+![image](https://user-images.githubusercontent.com/69920975/113874616-f39c8b00-97f0-11eb-9605-8cd9d9a298da.png)
+
+<그림 19. RMS prop>
 
  RMS prop은 Gradient descent에서 발생할 수 있는 진동 문제를 해결하기 위해 고안되었다. 위의 <그림19>에서 편의상 세로축을 parameter b, 가로축을 parameter w라고 두고, 빨간색 지점이 loss function이 최소가 되는 지점이라고 하자. 만약 RMS prop을 적용하지 않는다면 위의 파란색 선과 같이 학습할 때마다 진동을 하다가 최소지점에 도달할 것이다. 하지만 이러한 진동은 최솟값에 도달하는데 시간이 걸리고 이는 학습 속도가 느려지는데 영향을 준다. 따라서 위의 식과 같이 backpropagation으로 얻은 loss function의 w에 대한 미분 값 dw와 loss function의 b에 대한 미분 값 db를 각각 element wise형식으로 제곱하여 Sdw와 Sdb를 계산해준다. 여기서 사용된 계산 방법은 exponentially weighted average이다. 또한  는 hyperparameter로 조절 가능한 값이다.
 
@@ -62,7 +83,9 @@ Convolution 층에서는 입력 데이터를 필터가 stride만큼 움직이면
  
  2) Momentum
  
- ![image](https://user-images.githubusercontent.com/69920975/113874679-031bd400-97f1-11eb-9eea-f742cf72ab69.png)<그림 20. Momentum>
+ ![image](https://user-images.githubusercontent.com/69920975/113874679-031bd400-97f1-11eb-9eea-f742cf72ab69.png)
+ 
+ <그림 20. Momentum>
  
  Momentum도 RMSP와 비슷한 방식으로 학습속도를 빠르게 만들기 위해 사용되는 hyperparameter이다.
  RMSP와 마찬가지로 parameter을 최신화 할 때 dW와 db 대신 iteration 마다 계산한 Vdw,Vdb을 대입한다.
@@ -73,7 +96,9 @@ Convolution 층에서는 입력 데이터를 필터가 stride만큼 움직이면
 
 Drop out은 overfiiting 즉, 모델이 학습 데이터만 학습을 하여서 처음보는 test dataset을 보면 성능이 떨어지는 현상을 막기위해 사용하는 기법이다. 
 
-![image](https://user-images.githubusercontent.com/69920975/113874768-1890fe00-97f1-11eb-9738-dcba1a209584.png)<그림 21. Drop out>
+![image](https://user-images.githubusercontent.com/69920975/113874768-1890fe00-97f1-11eb-9738-dcba1a209584.png)
+
+<그림 21. Drop out>
 
 위의 사진에서 왼쪽은 표준 신경망이고 오른쪽은 dropout을 적용한 신경망이다. epoch마다 확률을 정의해 그 확률 값만큼 한 층의 unit들을 임의로 제거한다. 이렇게 하면 linear한 효과를 줄 수 있으며 overfitting을 방지해 새로운 dataset을 보고도 좋은 결과를 낼 수 있다.
 
