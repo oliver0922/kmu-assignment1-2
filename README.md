@@ -168,9 +168,181 @@ Drop out은 overfiiting 즉, 모델이 학습 데이터만 학습을 하여서 �
 
 
 
+## 2-1.Object Detection
+
+Object detection은 오늘날 자율주행 자동차에서 많이 사용되는 인지 분야이며 물체를 분류하는 Clasification과 물체의 위치를 찾아내는 Localization을 둘 다 해내는 분야이다.
+
+이제까지 나온 Object detection에 사용되는 architecture는 여러 가지가 있는데, 이제까지 나온 모델들을 크게 One-stage detector과 Two stage-detector로 아래 <그림1>과 같이 두 가지로 나눌 수 있다.
+
+
+![image](https://user-images.githubusercontent.com/69920975/113877395-a1a93480-97f3-11eb-9b01-664601592375.png)
+
+![image](https://user-images.githubusercontent.com/69920975/113877406-a40b8e80-97f3-11eb-9990-68dcf478608d.png)
+
+<그림 1. One Stage Detector(위)와 Two Stage Detector>
+
+간단히 말해 One Stage Detector는 Localization과 Classification을 동시에 수행하는 모델이며 대표적인 모델로는 SSD계열과 YOLO계열 등이 있다. 반면 Two Stage Detector는 Localization을 한 후 Classification을 순차적으로 진행하며 대표적인 모델로는 R-CNN계열의 모델들이 있다. One Stage Detector는 Localization과 Classification을 동시에 수행하므로 속도가 빠르지만 정확도가 낮다는 단점이 있으며, Two Stage Detector는 One Stage Detector에 비해 속도가 느리지만 정확도가 높다는 장점이 있다. 실제 자율주행 차량은 실시간으로 차량 주변의 상황을 빠르게 인식해야하므로 One Stage Detector가 주로 사용되고 따라서 이번 과제에서 널리 알려져있는 One Stage Detector 모델 YOLOv3를 사용하였다.
+
+**① YOLOv3** 
+
+YOLOv3 모델을 설명하기에 앞서 Object Detection을 이해하기 위해서는 IOU(Intersection Over Union)과 mAP(mean Average Precision)에 대한 이해가 필요하다.
+
+1) IOU(Intersection Over Union)
+
+IOU란 Intersection Over Union의 줄임말로 Ground Truth(정답)에 해당하는 사각형과 Bounding Box(예측값)의 교집합을 두 사각형의 합집합으로 나눈 것으로 bounding box를 얼마나 잘 예측하였는지 즉, Object Detector의 평가를 위한 척도이며 IOU가 아래 <그림2>와 같이 클수록 Ground Truth와 Prediction을 하는 bounding box가 많이 겹치므로 성능이 좋은 Object Detector이다.
+
+![image](https://user-images.githubusercontent.com/69920975/113877525-bf769980-97f3-11eb-85a3-72a1f914cb9b.png)
+
+ <그림 2>
+
+2) mAP(mean Average Precision)
+
+mAP(mean Average Precision)을 이해하기 위해서는 우선 Precision(정밀도)와 Recall(재현율)에 대한 이해가 필요하다. 이해를 위해 아래 <표1>을 살펴본다.
+
+![image](https://user-images.githubusercontent.com/69920975/113877577-cd2c1f00-97f3-11eb-853c-008cf00c15d8.png)
+
+<표1 Confusion Matrix >
+
+![image](https://user-images.githubusercontent.com/69920975/113877606-d3220000-97f3-11eb-903b-58baf9b0a343.png) ----(1)
+
+Precision(정밀도)은 위 수식 (1)과 같이 나타내며 Classifier가 어떠한 물체를 검출하였을 때 얼마나 옳은 검출을 했는지 나타내는 지표이다.
+
+![image](https://user-images.githubusercontent.com/69920975/113877644-dae1a480-97f3-11eb-9c0e-ac566e13da39.png)----(2)
+
+Recall(재현율)은 위의 수식 (2)와 같이 나타내며 Classifier가 마땅히 검출해내야하는 물체들 중에서 제대로 검출된 것의 비율을 의미한다.
+
+일반적으로 Precision을 올리면 Recall이 줄어들고 그 반대도 마찬가지이다. 이를 Precision Recall Trade off라고 하며 Precision과 Recall을 각각 x축 y축에 두고 그린 Precision-Recall 곡선은 아래 <그림 3>과 같다. 
+
+![image](https://user-images.githubusercontent.com/69920975/113877694-e92fc080-97f3-11eb-8a5a-d56aad2458da.png)
+
+<그림 3>
+
+ 위 개념을 사용하여 AP라는 개념을 정의할 수 있다. AP는 Average Precision의 약자로 위 그래프의 면적을 나타낸다. AP는 다음과 같이 계산한다. 최소 0% Recall에서 얻을 수 있는 최대 Precision, 다음 10%, 20% 이런 식으로 100% Recall에서의 최대 Precision을 계산한 후 평균을 내준다. 만약 두 개 이상의 class가 있을 때는 각 class에 대하여 AP를 계산 후, class의 개수로 나눠준다. 이것이 mAP이다.
+ 
+ 하지만 Object Detector에서 사용하는 mAP는 조금 더 복잡하다. 예를 들어 모델이 정확한 class를 탐지했지만 위치가 잘못되었다면(즉 bounding box 밖으로 객체가 벗어나면) 이를 올바른 예측으로 포함시키면 안된다. 따라서 위에서 정의한 IOU 개념을 사용한다. 만약 IOU가 0.5보다 크며 예측한 class가 맞으면 이때를 올바른 예측으로 간주하며 이를 mAP@0.5로 표현한다. COCO와 같은 대회에서는 여러 IOU값에서 mAP를 계산 후 이를 평균을 내준다.
+ 
+## 3) YOLOv3의 특징
+
+YOLOv3는 이미 나온 YOLO 모델의 성능을 약간 좋게 향상 시킨 모델이며 기존의 YOLO모델의 비해 큰 차이는 없다. 
+
+**① Bounding Box Prediction**
+
+![image](https://user-images.githubusercontent.com/69920975/113877822-06648f00-97f4-11eb-978d-aaff19dc2628.png)
+
+![image](https://user-images.githubusercontent.com/69920975/113877838-095f7f80-97f4-11eb-93c4-18888624b41f.png)
+![image](https://user-images.githubusercontent.com/69920975/113877846-0bc1d980-97f4-11eb-9c0f-4bea8cde68cd.png)
+
+YOLO9000과 마찬가지로 YOLOv3는 dimension cluster를 anchor box로 사용한다. 이 신경망은 각 bounding box의 4가지 좌표축을 예측한다. bounding box의 4가지 좌표는 sigmoid 함수, 및 exponential 함수를 사용하여 위의 수식과 같이 구한다. 또한 bounding box를 찾는 것은 regression의 문제이니 data를 training 시키는 동안 squared error loss를 사용한다. 즉 미리 anchor 박스를 정의해놓고 regression방법을 사용하여 achorbox를 얼마나 움직일지 예측하는 것이다.
+
+
+YOLOv3는 logistic regression을 사용하여 각 bounding box의 objectness score(confidence score)를 예측한다. 만약 bounding box prior가 다른 어떤 bounding box prior보다  ground truth와 겹친다면 objectness score가 1이 되야한다. 
+
+
+0.5를 threshold 값으로 사용하며, Faster R-CNN과 YOLOv3는 각 ground truth object에 대해 하나의 bounding box만을 할당한다.
+
+**② Class Prediction**
+
+보통 다른 모델들은 80개의 class(COCO기준)에 대해 softmax function을 사용하는데에 반해 YOLOv3는 sigmoid functinon을 사용해 mult-ilabel bianary classfication을 이용한다.  
+
+**③ Predictions Across Scales**
+
+ YOLOv3의 가장 큰 특징은 3개의 서로 다른 scale로 bounding box를 예측한다는 것이다. 또한 YOLOv3는 각 scale에 대해 3개의 box를 예측한다. 즉 9개의 box를 사용한다. 따라서 tensor의 크기는 N*N*(3*(4+1+80))이다. (4= bounding box의 정보 개수, 1= confidence score 또는 objectness score, 80=COCO dataset의 class 개수) 이를 나타내면 아래 그림과 같다. 
+ 
+ ![image](https://user-images.githubusercontent.com/69920975/113878007-2eec8900-97f4-11eb-9cec-bf15448613e4.png) 
+ 
+ <그림4>
+
+**③ Anchor Box**
+
+YOLOv3는 데이터 셋을 분석하여 k-means clustering을 사용하여 anchor박스를 정의한다. 즉 9개의 clusters와 3개의 sclale을 임의로 anchor box dimnesion을 할당한다.
+
+**④ Feature Extraction**
+
+Detection에는 back bone이 되는 CNN이 들어가야하는데, YOLOv1에서는 VGG net을 사용했으며 YOLOv2에서는 Darknet-19을 사용하고 YOLO v3에서는 새로운 모델 Darknet-53을 사용한다. 아래 구조를 보면 알 수 있듯이 YOLO v3는 3*3, 1*1 의 convolutional layer를 사용했지만, short connectino 때문에 네트워크 크기가 커졌다. 동일 환경에서 실험 결과 Darknet-53은 기존 Darknet-19 보다 강력하지만 ResNet 모델들보다 조금 더 효율적이다. 아래 표를 보면 Darknet-53은 BFLOP/s(floating point operation/seconds) 부문에서 좋은 성능을 보인다. 이는 Darknt-53이 GPU를 잘 활용한다는 것을 의미한다. 
+
+**⑤ YOLOv3 Architecture**
+
+![image](https://user-images.githubusercontent.com/69920975/113878113-475ca380-97f4-11eb-9760-1d7f1ed89860.png)
+
+위 그림은 YOLOv3의 전체적인 구조를 나타낸 그림이다. Darknet-53을 기본 구조로 갖고 있으며 순서대로 scale1,scale2,scale3가 있다. 여기서 scale1은 resolution이 제일 작으므로 큰 물체를 찾고 scale2는 중간물체 마지막으로 scale3은 resolution이 가장 크므로 제일 작은 물체를 찾아낸다. 또한 초록색으로 표시되는 것은 ResNet에서 사용되는 feature pyramid network를 나타낸 것으로, 위치 정보가 점점 올라갈수록 사라지는 것을 다시 역으로 더해 위치정보에 대한 성능을 높인다. 
+
+**⑥ Training**
+ YOLOv3는 full image를 사용하며 class에 background class라는 것을 포함시키지 않아 negative mining(data unbalance)은 사용하지 않는다. 또한 multi-scale training, data augmentation, batch normalization 등 규격화를 사용한다. 
+ 
+##2-2. 실습
+
+**① OpenSource**
+ 실습을 위해 또한 github에서 clone을 해왔는데 git의 주소는 아래와 같다.
+https://github.com/eriklindernoren/PyTorch-YOLOv3.git
+ 
+**② Dataset**
+ 위의 repository에서 제공하는 dataset은 coco dataset이며 train dataset만 해도 약 8만개여서 구글 colab환경에서 그만큼 많은 dataset을 이용하는 것은 디스크 용량 문제 때문에 불가능했다. 따라서 약간의 customize를 하여서 모델을 학습시키길 결정했다. 모델의 학습에 사용된  dataset은 roboflow에서 label이 이미 완료된 UDACITY의 self driving car 수업의 dataset들을 사용하였다. dataset은 image와 label 각각 15000개이며, ipynb를 참고하면 나오겠지만 sklearn의 train_test_split 함수를 사용하여 train set와 validation data set을 각각 14700개와 300개로 분할하였다. image는 jpg 파일 형식이며 label된 정보는 txt 파일에 담겨있다. 
+ 
+ ![image](https://user-images.githubusercontent.com/69920975/113878286-6eb37080-97f4-11eb-8e3c-e795b6e47e50.png)
+ 
+ <Dataset의 image의 예시>
+ 
+ ![image](https://user-images.githubusercontent.com/69920975/113878313-74a95180-97f4-11eb-977d-47c8b0f7aee6.png)
+ 
+ <Dataset의 label.txt의 예시>
+ 
+ 학습을 하기 위해서 주의할 점이 있는데 image data의 파일명과 그에 상응하는 정보가 담긴 label data의 파일명이 같아야 한다는 것이다.
+
+위의 예시의 각 한 줄은 bounding box 하나에 대한 정보가 담겨있다. 
+앞에서부터 총 5개의 숫자가 있는데 각 숫자가 의미하는 것은 순서대로 다음과 같다.
+1 0.6325520833333333 0.5016666666666667 0.10677083333333333 0.06
+첫 번째 숫자 1 : 각 class의 label을 의미한다, 여기서는 2번째 class car
+두 번째 숫자~ 다섯 번째 숫자: 0과 1사이의 값이며 bounding box의 x,y,w,h를 의미한다.
+
+모델이 분류한 class는 총 11개가 있으며 0부터 인덱스를 세야한다. 11개의 class는 아래와 같다. 
+
+0:biker
+1:car
+2:pedestrian
+3:trafficLight
+4:trafficLight-Green
+5:trafficLight-GreenLeft
+6:trafficLight-Red
+7:trafficLight-RedLeft
+8:trafficLight-Yellow
+9:trafficLight-YellowLeft
+10:truck
+
+또한 label.txt에 담긴 줄의 수 만큼 bounding box를 생성했고, 이는 객체를 그 개수만큼 객체를 인식했다는 것을 알 수 있다.
 
 
 
+
+**③ 구성 **
+
+위의 github에서 repository를 clone 하면 아래와 같이 directory들이 구성된다.
+
+![image](https://user-images.githubusercontent.com/69920975/113878433-8a1e7b80-97f4-11eb-9fc5-2ce6bb30a437.png)
+
+coco.data: cocodataset의 class 개수(80), train dataset의 path, valid dataset의 path, coco data set의 class가 적힌 파일 path 등이 적혀있다.
+create_custom_model.sh: yolov3_custom.cfg 파일을 만들기 위해서 작성된 linux 명령어가 담긴 파일이다.
+yolov3-custom.cfg: yolov3에 custom dataset을 적용시킬 때 필요한 class의 개수, hyper parameter 및 yolo의 전체적인 골격이 아래 사진과 같이 나타나있다. 
+
+![image](https://user-images.githubusercontent.com/69920975/113878466-9276b680-97f4-11eb-9236-32f974b05af0.png)
+![image](https://user-images.githubusercontent.com/69920975/113878487-99052e00-97f4-11eb-98ab-08370847f1e8.png)
+
+
+yolov3_tiny.cfg, yolov3.cfg: 마찬가지로 yolov3를 사용하기 위해 필요한 hyperparameter 값들이 담겨있으며 전체적인 구조가 담겨있고, yolov3.tiny.cfg는 모델을 조금 더 작은 것을 쓰고자 할 때 사용된다. 하지만 학습 효과는 그리 좋지 못하다.
+
+data 폴더: 아래 사진 참조
+
+![image](https://user-images.githubusercontent.com/69920975/113878523-a28e9600-97f4-11eb-9e43-824b46b2ee85.png)
+
+yolov3를 학습시킬 dataset들이 저장되는 폴더이며 custom 폴더에 사용자의 dataset 파일들을 image 폴더와 label 폴더에 각각 나누어서 넣는다.
+
+logs 폴더: 학습 시키는 동안의 log 기록들이 저장되어있는 폴더이다.
+output 폴더: yolov3 모델에 임의의 data를 적용했을 때 아래처럼 bounding box가 생성되어 나오는 사진들이 담긴 폴더이다.
+
+![image](https://user-images.githubusercontent.com/69920975/113878549-a9b5a400-97f4-11eb-8408-9746e488acb0.png)
+
+utils 폴더: train.py, test.py 등 다른 모듈들을 실행하고자 할 때 필요한 package들이 담겨있는 폴더이다.
+
+weights 폴더: 이미 학습된 파라미터들이 담겨있는 yolov3. weights 파일, darknet backbone이 들어있는 darknet53.conv.74 파일 등이 담겨있다.
 
 
 
