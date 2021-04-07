@@ -345,8 +345,11 @@ utils 폴더: train.py, test.py 등 다른 모듈들을 실행하고자 할 때 
 weights 폴더: 이미 학습된 파라미터들이 담겨있는 yolov3. weights 파일, darknet backbone이 들어있는 darknet53.conv.74 파일 등이 담겨있다.
 
 train.py: model을 학습시키고자 할 때 실행시키는 파일로 실행 중간에 test.py 내의 evaluate 함수를 호출하여 model을 validation set에 대한 평가하며 models.py 내부에 있는 여러 class 들을 가져와 사용한다. 코드 내용은 아래 사진과 같이 주석을 달아놓았다. 
+
 test.py: 학습된 모델을 평가하고자 할 때 사용되는 파일이고 코드와 코드 설명은 아래와 같다.
+
 models.py: module을 만들고 YOLO class와 Darknet class를 정의해놓은 파일이다. 코드설명은 아래와 같다.
+
 requirement.txt: 각 python 모듈을 실행하기 위해서 필요한 package 들에 대한 정보가 담겨있으며 이를 실행하면 package 들이 google colab 환경에 설치된다.
 
 
