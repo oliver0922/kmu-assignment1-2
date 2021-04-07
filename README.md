@@ -61,6 +61,7 @@ Convolution 층에서는 입력 데이터를 필터가 stride만큼 움직이면
  마지막으로 parameter를 최신화 해줄 때 위에서 구한 Sdw와 Sdb를 각각 계산식에 나눠준다. 위의 예시와 같은 경우 Sdw를 점점 작게 만들고 Sdb를 점점 크게 만든다. 그 결과 dW는 크게 db는 작게 만들어서 세로축으로의 학습 속도는 느리게 가로축의 학습 속도는 빠르게 만들어서 진동을 줄여 최솟값에 더 빨리 도달하도록 만든다. 
  
  2) Momentum
+ 
  ![image](https://user-images.githubusercontent.com/69920975/113874679-031bd400-97f1-11eb-9eea-f742cf72ab69.png)<그림 20. Momentum>
  
  Momentum도 RMSP와 비슷한 방식으로 학습속도를 빠르게 만들기 위해 사용되는 hyperparameter이다.
@@ -91,8 +92,8 @@ Drop out은 overfiiting 즉, 모델이 학습 데이터만 학습을 하여서 �
 
 ⑤modify model and repeat ③~④ then test
 
-
 시작에 앞서 tutorial에 필요한 package들을 import한다.
+
 ![image](https://user-images.githubusercontent.com/69920975/113874860-2d6d9180-97f1-11eb-98d1-ca855ab51a93.png)
 
 **①Data Download and visualize(dataset은 기본으로 주어지는 꽃 데이터셋을 사용하였다)**
@@ -102,15 +103,18 @@ Drop out은 overfiiting 즉, 모델이 학습 데이터만 학습을 하여서 �
 ![image](https://user-images.githubusercontent.com/69920975/113874929-3bbbad80-97f1-11eb-8035-01a2bcd38b8f.png)
 
 **②Pre-process Dataset**
+
 ![image](https://user-images.githubusercontent.com/69920975/113874990-4a09c980-97f1-11eb-90e2-930df3c3f5b7.png)
 ![image](https://user-images.githubusercontent.com/69920975/113875026-51c96e00-97f1-11eb-91bd-75475735208d.png)
 ![image](https://user-images.githubusercontent.com/69920975/113875045-555cf500-97f1-11eb-8f2d-c4679bb53c01.png)
 
 **③build model**
+
 ![image](https://user-images.githubusercontent.com/69920975/113875082-5ee65d00-97f1-11eb-80e8-4d495b9b55ad.png)
 ![image](https://user-images.githubusercontent.com/69920975/113875092-6148b700-97f1-11eb-8cc1-515c77e4ef5a.png)
 
 **④train model**
+
 ![image](https://user-images.githubusercontent.com/69920975/113875116-673e9800-97f1-11eb-9d55-0f10efe03e07.png)
 
 ![image](https://user-images.githubusercontent.com/69920975/113875128-69a0f200-97f1-11eb-8e40-def23c0bcbf0.png)
