@@ -53,22 +53,27 @@ Convolution 층에서는 입력 데이터를 필터가 stride만큼 움직이면
  이제 오픈소스에서 사용된 Optimizer에 대해 알아보자. Optimizer에는 여러 종류(SGD, NAG,NAdam)가 있는데 이번 오픈소스에서는 Adam Optimizer가 사용됐다 Adam Optimizer에는 RMS Prop 방법과 momentum hyperparameter가 같이 쓰였다. 
  
  1) RMS prop 
-  ![image](https://user-images.githubusercontent.com/69920975/113874616-f39c8b00-97f0-11eb-9605-8cd9d9a298da.png)<그림 19. RMS prop>
-RMS prop은 Gradient descent에서 발생할 수 있는 진동 문제를 해결하기 위해 고안되었다. 위의 <그림19>에서 편의상 세로축을 parameter b, 가로축을 parameter w라고 두고, 빨간색 지점이 loss function이 최소가 되는 지점이라고 하자. 만약 RMS prop을 적용하지 않는다면 위의 파란색 선과 같이 학습할 때마다 진동을 하다가 최소지점에 도달할 것이다. 하지만 이러한 진동은 최솟값에 도달하는데 시간이 걸리고 이는 학습 속도가 느려지는데 영향을 준다. 따라서 위의 식과 같이 backpropagation으로 얻은 loss function의 w에 대한 미분 값 dw와 loss function의 b에 대한 미분 값 db를 각각 element wise형식으로 제곱하여 Sdw와 Sdb를 계산해준다. 여기서 사용된 계산 방법은 exponentially weighted average이다. 또한  는 hyperparameter로 조절 가능한 값이다.
+
+![image](https://user-images.githubusercontent.com/69920975/113874616-f39c8b00-97f0-11eb-9605-8cd9d9a298da.png)<그림 19. RMS prop>
+
+ RMS prop은 Gradient descent에서 발생할 수 있는 진동 문제를 해결하기 위해 고안되었다. 위의 <그림19>에서 편의상 세로축을 parameter b, 가로축을 parameter w라고 두고, 빨간색 지점이 loss function이 최소가 되는 지점이라고 하자. 만약 RMS prop을 적용하지 않는다면 위의 파란색 선과 같이 학습할 때마다 진동을 하다가 최소지점에 도달할 것이다. 하지만 이러한 진동은 최솟값에 도달하는데 시간이 걸리고 이는 학습 속도가 느려지는데 영향을 준다. 따라서 위의 식과 같이 backpropagation으로 얻은 loss function의 w에 대한 미분 값 dw와 loss function의 b에 대한 미분 값 db를 각각 element wise형식으로 제곱하여 Sdw와 Sdb를 계산해준다. 여기서 사용된 계산 방법은 exponentially weighted average이다. 또한  는 hyperparameter로 조절 가능한 값이다.
 
  마지막으로 parameter를 최신화 해줄 때 위에서 구한 Sdw와 Sdb를 각각 계산식에 나눠준다. 위의 예시와 같은 경우 Sdw를 점점 작게 만들고 Sdb를 점점 크게 만든다. 그 결과 dW는 크게 db는 작게 만들어서 세로축으로의 학습 속도는 느리게 가로축의 학습 속도는 빠르게 만들어서 진동을 줄여 최솟값에 더 빨리 도달하도록 만든다. 
  
  2) Momentum
- ![image](https://user-images.githubusercontent.com/69920975/113874679-031bd400-97f1-11eb-9eea-f742cf72ab69.png)<그림 20. Momentum> 
-Momentum도 RMSP와 비슷한 방식으로 학습속도를 빠르게 만들기 위해 사용되는 hyperparameter이다.
-RMSP와 마찬가지로 parameter을 최신화 할 때 dW와 db 대신 iteration 마다 계산한 Vdw,Vdb을 대입한다.
-이 결과 gradient descent 절차를 smooth하게 만들어 준다.
+ ![image](https://user-images.githubusercontent.com/69920975/113874679-031bd400-97f1-11eb-9eea-f742cf72ab69.png)<그림 20. Momentum>
+ 
+ Momentum도 RMSP와 비슷한 방식으로 학습속도를 빠르게 만들기 위해 사용되는 hyperparameter이다.
+ RMSP와 마찬가지로 parameter을 최신화 할 때 dW와 db 대신 iteration 마다 계산한 Vdw,Vdb을 대입한다.
+ 이 결과 gradient descent 절차를 smooth하게 만들어 준다.
 
 
 **⑤ Drop out**
+
 Drop out은 overfiiting 즉, 모델이 학습 데이터만 학습을 하여서 처음보는 test dataset을 보면 성능이 떨어지는 현상을 막기위해 사용하는 기법이다. 
 
 ![image](https://user-images.githubusercontent.com/69920975/113874768-1890fe00-97f1-11eb-9738-dcba1a209584.png)<그림 21. Drop out>
+
 위의 사진에서 왼쪽은 표준 신경망이고 오른쪽은 dropout을 적용한 신경망이다. epoch마다 확률을 정의해 그 확률 값만큼 한 층의 unit들을 임의로 제거한다. 이렇게 하면 linear한 효과를 줄 수 있으며 overfitting을 방지해 새로운 dataset을 보고도 좋은 결과를 낼 수 있다.
 
 ## 1-2.실습
@@ -77,9 +82,13 @@ Drop out은 overfiiting 즉, 모델이 학습 데이터만 학습을 하여서 �
 
 구성은 다음과 같다. (코드 관련된 설명은 사진 내의 주석으로 있다.)
 ①Data Download and visualize
+
 ②Pre-process Dataset
+
 ③build model
+
 ④train model
+
 ⑤modify model and repeat ③~④ then test
 
 
