@@ -353,7 +353,7 @@ models.py: module을 만들고 YOLO class와 Darknet class를 정의해놓은 �
 requirement.txt: 각 python 모듈을 실행하기 위해서 필요한 package 들에 대한 정보가 담겨있으며 이를 실행하면 package 들이 google colab 환경에 설치된다.
 
 
-
+colab link:https://drive.google.com/file/d/12fFTJE8BkPLesVjrPxy_RyGR9-Aoo8Ua/view?usp=sharing
 
 
 
