@@ -221,7 +221,7 @@ Recall(재현율)은 위의 수식 (2)와 같이 나타내며 Classifier가 마�
  
  하지만 Object Detector에서 사용하는 mAP는 조금 더 복잡하다. 예를 들어 모델이 정확한 class를 탐지했지만 위치가 잘못되었다면(즉 bounding box 밖으로 객체가 벗어나면) 이를 올바른 예측으로 포함시키면 안된다. 따라서 위에서 정의한 IOU 개념을 사용한다. 만약 IOU가 0.5보다 크며 예측한 class가 맞으면 이때를 올바른 예측으로 간주하며 이를 mAP@0.5로 표현한다. COCO와 같은 대회에서는 여러 IOU값에서 mAP를 계산 후 이를 평균을 내준다.
  
-## 3) YOLOv3의 특징
+3) YOLOv3의 특징
 
 YOLOv3는 이미 나온 YOLO 모델의 성능을 약간 좋게 향상 시킨 모델이며 기존의 YOLO모델의 비해 큰 차이는 없다. 
 
@@ -269,7 +269,7 @@ Detection에는 back bone이 되는 CNN이 들어가야하는데, YOLOv1에서�
 **⑥ Training**
  YOLOv3는 full image를 사용하며 class에 background class라는 것을 포함시키지 않아 negative mining(data unbalance)은 사용하지 않는다. 또한 multi-scale training, data augmentation, batch normalization 등 규격화를 사용한다. 
  
-##2-2. 실습
+## 2-2. 실습
 
 **① OpenSource**
  실습을 위해 또한 github에서 clone을 해왔는데 git의 주소는 아래와 같다.
@@ -313,7 +313,7 @@ https://github.com/eriklindernoren/PyTorch-YOLOv3.git
 
 
 
-**③ 구성 **
+**③구성**
 
 위의 github에서 repository를 clone 하면 아래와 같이 directory들이 구성된다.
 
